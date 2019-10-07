@@ -57,15 +57,6 @@ while(True):
         time.sleep(0)
 
 
-
-
-
-
-
-
-
-
-
 print ("Moving Forwards & Turn Left")
 GPIO.output(MotorA,False)
 GPIO.output(MotorB,True)
