@@ -25,6 +25,9 @@ while(True):
     distance = duration * 17150
     distance = round(distance,2)
     print ("Distance:", distance, "cm     ")
+    distance = distance * 0.393701
+    distance = round(distance,2)
+    print ("Distance:", distance, "in     ")
 
   
     
