@@ -1,27 +1,94 @@
+#importing libraries, setting up board
 import RPi.GPIO as GPIO
 import time
- 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
+
+#setup Motors
 MotorA = 16
 MotorB = 18
 MotorE = 22
-SteerA = 15
-SteerB = 13
-SteerE = 11
-trig = 40 
-echo = 38
 GPIO.setup(MotorA,GPIO.OUT)
 GPIO.setup(MotorB,GPIO.OUT)
 GPIO.setup(MotorE,GPIO.OUT)
+
+#setup Steering
+SteerA = 15
+SteerB = 13
+SteerE = 11
 GPIO.setup(SteerA,GPIO.OUT)
 GPIO.setup(SteerB,GPIO.OUT)
 GPIO.setup(SteerE,GPIO.OUT)
+
+#setup Ultrasonic sensor
+trig = 40 
+echo = 38
 GPIO.setup(trig,GPIO.OUT)
 GPIO.setup(echo,GPIO.IN)
 
+#setup PWM 
+pwm=GPIO.PWM(MotorE,100)
+pwm.start(0)
 
+def Left45(speed,delay):
+    print("Reverse Left 45")
+    pwm.ChangeDutyCycle(speed)
+    GPIO.output(MotorA,GPIO.HIGH)
+    GPIO.output(MotorB,GPIO.LOW)
+    GPIO.output(MotorE,GPIO.HIGH)
+    GPIO.output(SteerA,GPIO.LOW)
+    GPIO.output(SteerB,GPIO.HIGH)
+    GPIO.output(SteerE,GPIO.HIGH)
+    time.sleep(delay)
+
+def Left90(speed,delay):
+    print("Reverse Left 90")
+    pwm.ChangeDutyCycle(speed)
+    GPIO.output(MotorA,GPIO.HIGH)
+    GPIO.output(MotorB,GPIO.LOW)
+    GPIO.output(MotorE,GPIO.HIGH)
+    GPIO.output(SteerA,GPIO.LOW)
+    GPIO.output(SteerB,GPIO.HIGH)
+    GPIO.output(SteerE,GPIO.HIGH)
+    time.sleep(delay)
+
+def Right45(speed,delay):
+    print("Reverse Right 45")
+    pwm.ChangeDutyCycle(speed)
+    GPIO.output(MotorA,GPIO.HIGH)
+    GPIO.output(MotorB,GPIO.LOW)
+    GPIO.output(MotorE,GPIO.HIGH)
+    GPIO.output(SteerA,GPIO.HIGH)
+    GPIO.output(SteerB,GPIO.LOW)
+    GPIO.output(SteerE,GPIO.HIGH)
+    time.sleep(delay)
+
+def Right90(speed,delay):
+    print("Reverse Right 90")
+    pwm.ChangeDutyCycle(speed)
+    GPIO.output(MotorA,GPIO.HIGH)
+    GPIO.output(MotorB,GPIO.LOW)
+    GPIO.output(MotorE,GPIO.HIGH)
+    GPIO.output(SteerA,GPIO.HIGH)
+    GPIO.output(SteerB,GPIO.LOW)
+    GPIO.output(SteerE,GPIO.HIGH)
+    time.sleep(delay)
+
+def forward(speed,delay):
+    pwm.ChangeDutyCycle(speed)
+    GPIO.output(MotorA,GPIO.LOW)
+    GPIO.output(MotorB,GPIO.HIGH)
+    GPIO.output(MotorE,GPIO.HIGH)
+    GPIO.output(SteerE,GPIO.LOW)
+    time.sleep(delay)
+
+switch = 0
+count = 0
+maxIts = 100
 while(True):
+    count = count + 1
+    if(count > maxIts): break
+    
     GPIO.output(trig,False)
     time.sleep(.05)
     GPIO.output(trig,True)
@@ -35,109 +102,32 @@ while(True):
     while (GPIO.input(echo) == 1):
         end = time.time()
     duration = end - start
-    distance = duration * 17150
+    distance = duration * 17150  * 0.393701
     distance = round(distance,2)
-    print ("Distance:", distance, "cm     ")
+    print ("Distance:", distance, "in")
 
-    if(distance < 20):
-        print ("Moving Backwards & Turn Right")
-        GPIO.output(MotorA,True)
-        GPIO.output(MotorB,False)
-        GPIO.output(MotorE,True)
-        GPIO.output(SteerA,True)
-        GPIO.output(SteerB,False)
-        GPIO.output(SteerE,True)
-        time.sleep(0.1)
-    if (distance > 20):
-        print ("Moving Forwards")
-        GPIO.output(MotorA,False)
-        GPIO.output(MotorB,True)
-        GPIO.output(MotorE,True)
-        GPIO.output(SteerE,False)
-        time.sleep(0)
-
-
-print ("Moving Forwards & Turn Left")
-GPIO.output(MotorA,False)
-GPIO.output(MotorB,True)
-GPIO.output(MotorE,True)
-GPIO.output(SteerA,False)
-GPIO.output(SteerB,True)
-GPIO.output(SteerE,True)
-sleep(2)
-
-print ("Moving Backwards & Turn Right")
-GPIO.output(MotorA,True)
-GPIO.output(MotorB,False)
-GPIO.output(MotorE,True)
-GPIO.output(SteerA,True)
-GPIO.output(SteerB,False)
-GPIO.output(SteerE,True)
-sleep(2)
- 
-print ("Stopping motor")
-GPIO.output(MotorE,False)
-GPIO.output(SteerE,False)
-
-print ("PWM test")
-GPIO.output(MotorE,GPIO.HIGH)
-pwm1 = GPIO.PWM(MotorA,100)
-pwm2 = GPIO.PWM(MotorB,100)
-pwm3 = GPIO.PWM(MotorE,100)
-dc = 0
-pwm1.start(dc)
-pwm2.start(dc)
-pwm3.start(dc)
-
-dc = 70
-print ("PWM speed of: ", dc)
-pwm1.ChangeDutyCycle(dc)
-pwm2.ChangeDutyCycle(dc)
-#pwm3.ChangeDutyCycle(dc)
-GPIO.output(MotorA,GPIO.LOW)
-GPIO.output(MotorB,GPIO.HIGH)
-GPIO.output(MotorE,GPIO.HIGH)
-
-sleep (3)
-
-dc = 99
-print ("PWM speed of: ", dc)
-pwm1.ChangeDutyCycle(dc)
-pwm2.ChangeDutyCycle(dc)
-pwm3.ChangeDutyCycle(dc)
-GPIO.output(MotorA,GPIO.LOW)
-GPIO.output(MotorB,GPIO.HIGH)
-GPIO.output(MotorE,GPIO.HIGH)
-sleep (6)
-
-
-
-
-
-
-
-
-
-
-while False:
-      for dc in range(28, 33, 1):    # Loop 0 to 100 stepping dc by 5 each loop
-            print ("PWM speed of: ", dc)
-            pwm1.ChangeDutyCycle(dc)
-            pwm2.ChangeDutyCycle(dc)
-            pwm3.ChangeDutyCycle(dc)
-            GPIO.output(MotorA,GPIO.LOW)
-            GPIO.output(MotorB,GPIO.HIGH)
-            GPIO.output(MotorE,GPIO.HIGH)
-            sleep (6)
-
-      for dc in range(55, 65, 1):    # Loop 0 to 100 stepping dc by 5 each loop
-            print ("PWM speed of: ", dc)
-            pwm1.ChangeDutyCycle(dc)
-            pwm2.ChangeDutyCycle(dc)
-            pwm3.ChangeDutyCycle(dc)
-            GPIO.output(MotorA,GPIO.LOW)
-            GPIO.output(MotorB,GPIO.HIGH)
-            GPIO.output(MotorE,GPIO.HIGH)
-            sleep (3)
-
+    if(distance < 10):
+        if(switch == 0):
+            Left45(75,1.30)
+            switch = 1;
+        elif(switch == 1):
+            Right90(75,1.60)
+            switch = 2;
+        elif(switch == 2):
+            Left90(75,1.60)
+            switch = 3;
+        else:
+            Right45(75,1.30)
+            switch = 0;
+        
+    elif (distance > 10):
+        if(distance > 100):
+            forward(100,0)
+        elif(distance < 40 and distance > 10):
+            forward(40,0)
+        else:
+            forward(distance,0)
+            
+print("End Program")
+pwm.stop()
 GPIO.cleanup()
